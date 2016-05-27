@@ -43,7 +43,11 @@ NSString *__nonnull const SCCAPIRequestOptionsKey = @"options";
 NSString *__nonnull const SCCAPIRequestOptionsSupportedTenderTypesKey = @"supported_tender_types";
 NSString *__nonnull const SCCAPIRequestOptionsClearDefaultFeesKey = @"clear_default_fees";
 NSString *__nonnull const SCCAPIRequestOptionsAutoReturnKey = @"auto_return";
+NSString *__nonnull const SCCAPIRequestOptionsAllowSplitTenderKey = @"allow_split_tender";
 NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringCard = @"CREDIT_CARD";
+NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringCash = @"CASH";
+NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringOther = @"OTHER";
+NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringGiftCard = @"SQUARE_GIFT_CARD";
 
 
 @implementation SCCAPIRequest
@@ -82,6 +86,7 @@ static NSString *__nullable APIClientID = nil;
                                      merchantID:(nullable NSString *)merchantID
                                           notes:(nullable NSString *)notes
                            supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
+                               allowSplitTender:(BOOL)allowSplitTender
                               clearsDefaultFees:(BOOL)clearsDefaultFees
                 returnAutomaticallyAfterPayment:(BOOL)autoreturn
                                           error:(out NSError *__nullable *__nullable)error;
@@ -114,6 +119,7 @@ static NSString *__nullable APIClientID = nil;
                                merchantID:merchantID
                                     notes:notes
                      supportedTenderTypes:supportedTenderTypes
+                         allowSplitTender:allowSplitTender
                         clearsDefaultFees:clearsDefaultFees
           returnAutomaticallyAfterPayment:autoreturn];
 }
@@ -125,6 +131,7 @@ static NSString *__nullable APIClientID = nil;
                       merchantID:(nullable NSString *)merchantID
                            notes:(nullable NSString *)notes
             supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
+                allowSplitTender:(BOOL)allowSplitTender
                clearsDefaultFees:(BOOL)clearsDefaultFees
  returnAutomaticallyAfterPayment:(BOOL)autoreturn;
 {
@@ -143,6 +150,7 @@ static NSString *__nullable APIClientID = nil;
     _merchantID = [merchantID copy];
     _notes = [notes copy];
     _supportedTenderTypes = supportedTenderTypes;
+    _allowsSplitTender = allowSplitTender;
     _clearsDefaultFees = clearsDefaultFees;
     _returnsAutomaticallyAfterPayment = autoreturn;
 
@@ -168,7 +176,7 @@ static NSString *__nullable APIClientID = nil;
 {
     NSUInteger const hashOfRequiredFields = self.clientID.hash ^ self.callbackURL.hash ^ self.amount.hash;
     NSUInteger const hashOfOptionalFields = self.userInfoString.hash ^ self.merchantID.hash ^ self.notes.hash;
-    NSUInteger const hashOfScalarFields = (NSUInteger)self.supportedTenderTypes ^ (NSUInteger)self.clearsDefaultFees ^ (NSUInteger)self.returnsAutomaticallyAfterPayment;
+    NSUInteger const hashOfScalarFields = (NSUInteger)self.supportedTenderTypes ^ (NSUInteger)self.allowsSplitTender ^ (NSUInteger)self.clearsDefaultFees ^ (NSUInteger)self.returnsAutomaticallyAfterPayment;
 
     return hashOfRequiredFields ^ hashOfOptionalFields ^ hashOfScalarFields;
 }
@@ -209,6 +217,7 @@ static NSString *__nullable APIClientID = nil;
 
     // The following properties are scalar.
     if (!(self.supportedTenderTypes == request.supportedTenderTypes) ||
+        !(self.allowsSplitTender == request.allowsSplitTender) ||
         !(self.clearsDefaultFees == request.clearsDefaultFees) ||
         !(self.returnsAutomaticallyAfterPayment == request.returnsAutomaticallyAfterPayment)) {
         return NO;
@@ -224,6 +233,30 @@ static NSString *__nullable APIClientID = nil;
     }
 
     return YES;
+}
+
+#pragma mark - Deprecated Methods
+
++ (nullable instancetype)requestWithCallbackURL:(nonnull NSURL *)callbackURL
+                                         amount:(nonnull SCCMoney *)amount
+                                 userInfoString:(nullable NSString *)userInfoString
+                                     merchantID:(nullable NSString *)merchantID
+                                          notes:(nullable NSString *)notes
+                           supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
+                              clearsDefaultFees:(BOOL)clearsDefaultFees
+                returnAutomaticallyAfterPayment:(BOOL)autoreturn
+                                          error:(out NSError *__nullable *__nullable)error;
+{
+    return [self requestWithCallbackURL:callbackURL
+                                 amount:amount
+                         userInfoString:userInfoString
+                             merchantID:merchantID
+                                  notes:notes
+                   supportedTenderTypes:supportedTenderTypes
+                       allowSplitTender:NO
+                      clearsDefaultFees:clearsDefaultFees
+        returnAutomaticallyAfterPayment:autoreturn
+                                  error:error];
 }
 
 @end
@@ -246,6 +279,7 @@ static NSString *__nullable APIClientID = nil;
     NSMutableDictionary *const options = [NSMutableDictionary dictionary];
     NSArray *const supportedTenderTypes = NSArrayOfTenderTypeStringsFromSCCAPIRequestTenderTypes(self.supportedTenderTypes);
     [options SCC_setSafeObject:supportedTenderTypes forKey:SCCAPIRequestOptionsSupportedTenderTypesKey];
+    [options SCC_setSafeObject:@(self.allowsSplitTender) forKey:SCCAPIRequestOptionsAllowSplitTenderKey];
     [options SCC_setSafeObject:@(self.clearsDefaultFees) forKey:SCCAPIRequestOptionsClearDefaultFeesKey];
     [options SCC_setSafeObject:@(self.returnsAutomaticallyAfterPayment) forKey:SCCAPIRequestOptionsAutoReturnKey];
     if (options.count) {
@@ -280,6 +314,18 @@ NSArray *__nonnull NSArrayOfTenderTypeStringsFromSCCAPIRequestTenderTypes(SCCAPI
 
     if (tenderTypes & SCCAPIRequestTenderTypeCard) {
         [arrayOfTenderTypes addObject:SCCAPIRequestOptionsTenderTypeStringCard];
+    }
+
+    if (tenderTypes & SCCAPIRequestTenderTypeCash) {
+        [arrayOfTenderTypes addObject:SCCAPIRequestOptionsTenderTypeStringCash];
+    }
+
+    if (tenderTypes & SCCAPIRequestTenderTypeOther) {
+        [arrayOfTenderTypes addObject:SCCAPIRequestOptionsTenderTypeStringOther];
+    }
+
+    if (tenderTypes & SCCAPIRequestTenderTypeGiftCard) {
+        [arrayOfTenderTypes addObject:SCCAPIRequestOptionsTenderTypeStringGiftCard];
     }
 
     return arrayOfTenderTypes;

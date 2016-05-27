@@ -30,6 +30,15 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
 
     /// Allow the merchant to accept card tenders to complete the payment.
     SCCAPIRequestTenderTypeCard = 1 << 0,
+
+    /// Allow the merchant to accept cash tenders to complete the payment.
+    SCCAPIRequestTenderTypeCash = 1 << 1,
+
+    /// Allow the merchant to accept other tenders to complete the payment.
+    SCCAPIRequestTenderTypeOther = 1 << 2,
+
+    /// Allow the merchant to accept gift card tenders to complete the payment.
+    SCCAPIRequestTenderTypeGiftCard = 1 << 3,
 };
 
 
@@ -56,6 +65,7 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
  @param merchantID The merchant's Square-issued ID. Optional.
  @param notes A custom note to associate with the resulting payment. Optional.
  @param supportedTenderTypes The types of tender that Square Register is allowed to accept for the payment. Required.
+ @param allowSplitTender If YES, can split the payment between multiple tenders.
  @param clearsDefaultFees If YES, default fees (i.e., taxes) are not automatically applied to the payment in Square Register.
  @param autoreturn If NO, merchant must tap New Sale in Register to switch back to requesting application on the receipt screen.
    If YES, Register will automatically switch back to the requesting application after a timeout elapses from the receipt screen.
@@ -67,6 +77,7 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
                                      merchantID:(nullable NSString *)merchantID
                                           notes:(nullable NSString *)notes
                            supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
+                               allowSplitTender:(BOOL)allowSplitTender
                               clearsDefaultFees:(BOOL)clearsDefaultFees
                 returnAutomaticallyAfterPayment:(BOOL)autoreturn
                                           error:(out NSError *__nullable *__nullable)error;
@@ -92,6 +103,9 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
 /// The types of tender that Square Register is allowed to accept for the payment.
 @property (nonatomic, assign, readonly) SCCAPIRequestTenderTypes supportedTenderTypes;
 
+/// If YES, allows the payment to be split across multiple tenders.
+@property (nonatomic, assign, readonly) BOOL allowsSplitTender;
+
 /// If YES, default fees (i.e., taxes) are not automatically applied to the payment in Square Register.
 @property (nonatomic, assign, readonly) BOOL clearsDefaultFees;
 
@@ -104,6 +118,22 @@ typedef NS_OPTIONS(NSUInteger, SCCAPIRequestTenderTypes) {
  @return YES if the receiver and `request` are logically equivalent.
  */
 - (BOOL)isEqualToAPIRequest:(nullable SCCAPIRequest *)request;
+
+#pragma mark - Deprecated Methods
+
+/**
+ Deprecated initializer for the Register API request.
+ @see requestWithCallbackURL:amount:userInfoString:merchantID:notes:supportedTenderType:allowSplitTender:clearsDefaultFees:returnAutomaticallyAfterPayment:error:
+ */
++ (nullable instancetype)requestWithCallbackURL:(nonnull NSURL *)callbackURL
+                                         amount:(nonnull SCCMoney *)amount
+                                 userInfoString:(nullable NSString *)userInfoString
+                                     merchantID:(nullable NSString *)merchantID
+                                          notes:(nullable NSString *)notes
+                           supportedTenderTypes:(SCCAPIRequestTenderTypes)supportedTenderTypes
+                              clearsDefaultFees:(BOOL)clearsDefaultFees
+                returnAutomaticallyAfterPayment:(BOOL)autoreturn
+                                          error:(out NSError *__nullable *__nullable)error DEPRECATED_ATTRIBUTE;
 
 @end
 

@@ -1,6 +1,6 @@
 PODS:
   - OCMock (3.1.5)
-  - SquareRegisterSDK (1.0.0)
+  - SquareRegisterSDK (1.1)
 
 DEPENDENCIES:
   - OCMock (~> 3.1)
@@ -12,7 +12,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   OCMock: 4c2925291f80407c3738dd1db14d21d0cc278864
-  SquareRegisterSDK: b567ce4593ab18ab4eec817b3a1927552ede38b1
+  SquareRegisterSDK: 45c18c4518a13fa79307d61e84491b8fb59190e0
 
 PODFILE CHECKSUM: 9f64c4d4f952ac5731852e15c4c943fd60a4fadc
 

@@ -52,6 +52,7 @@ class SCCAPIRequestTests: SCCTestCase {
             let amount = try! SCCMoney(amountCents: 100, currencyCode: "USD")
             let callbackURL = NSURL(string: "register-sdk-testapp://myCallback")!
             let supportedTenderTypes = SCCAPIRequestTenderTypes.Card
+            let allowSplitTender = true
             let clearsDefaultFees = true
             let autoreturn = true
 
@@ -62,6 +63,7 @@ class SCCAPIRequestTests: SCCTestCase {
                 merchantID: merchantID,
                 notes: notes,
                 supportedTenderTypes: supportedTenderTypes,
+                allowSplitTender: allowSplitTender,
                 clearsDefaultFees: clearsDefaultFees,
                 returnAutomaticallyAfterPayment: autoreturn)
 
@@ -72,6 +74,7 @@ class SCCAPIRequestTests: SCCTestCase {
             XCTAssertEqual(completeRequest.amount, amount)
             XCTAssertEqual(completeRequest.callbackURL, callbackURL)
             XCTAssertEqual(completeRequest.supportedTenderTypes, supportedTenderTypes)
+            XCTAssertEqual(completeRequest.allowsSplitTender, allowSplitTender)
             XCTAssertEqual(completeRequest.clearsDefaultFees, clearsDefaultFees)
             XCTAssertEqual(completeRequest.returnsAutomaticallyAfterPayment, autoreturn)
         } catch _ {
@@ -89,6 +92,7 @@ class SCCAPIRequestTests: SCCTestCase {
                 merchantID: nil,
                 notes: nil,
                 supportedTenderTypes: SCCAPIRequestTenderTypes.All,
+                allowSplitTender: false,
                 clearsDefaultFees: false,
                 returnAutomaticallyAfterPayment: false)
             XCTFail()
@@ -107,6 +111,7 @@ class SCCAPIRequestTests: SCCTestCase {
                 merchantID: nil,
                 notes: nil,
                 supportedTenderTypes: SCCAPIRequestTenderTypes.All,
+                allowSplitTender: false,
                 clearsDefaultFees: false,
                 returnAutomaticallyAfterPayment: false)
             XCTFail()
@@ -125,6 +130,7 @@ class SCCAPIRequestTests: SCCTestCase {
                 merchantID: nil,
                 notes: nil,
                 supportedTenderTypes: SCCAPIRequestTenderTypes.All,
+                allowSplitTender: false,
                 clearsDefaultFees: false,
                 returnAutomaticallyAfterPayment: false)
             XCTFail()
@@ -143,6 +149,7 @@ class SCCAPIRequestTests: SCCTestCase {
                 merchantID: "abc123",
                 notes: "blue shoes",
                 supportedTenderTypes: SCCAPIRequestTenderTypes.Card,
+                allowSplitTender: false,
                 clearsDefaultFees: false,
                 returnAutomaticallyAfterPayment: true)
             let requestURL = try request.APIRequestURL()
@@ -161,7 +168,8 @@ class SCCAPIRequestTests: SCCTestCase {
                 "options" : [
                     "supported_tender_types" : [ "CREDIT_CARD" ],
                     "clear_default_fees" : false,
-                    "auto_return" : true
+                    "auto_return" : true,
+                    "allow_split_tender" : false
                 ]
             ]
 
@@ -178,6 +186,7 @@ class SCCAPIRequestTests: SCCTestCase {
         let amount = try! SCCMoney(amountCents: 100, currencyCode: "USD")
         let callbackURL = NSURL(string: "register-sdk-testapp://myCallback")!
         let supportedTenderTypes = SCCAPIRequestTenderTypes.Card
+        let allowSplitTender = true
         let clearsDefaultFees = true
         let autoreturn = true
 
@@ -188,6 +197,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn)
 
@@ -199,6 +209,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
 
@@ -211,6 +222,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
         SCCAPIRequest.setClientID(SCCAPIRequestTests.defaultTestClientID)
@@ -223,6 +235,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
 
@@ -234,6 +247,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
 
@@ -245,6 +259,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
 
@@ -256,6 +271,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: "DIFFERENT_MERCHANT_ID",
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
 
@@ -267,7 +283,32 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: "DIFFERENT_NOTES",
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
+            returnAutomaticallyAfterPayment: autoreturn))
+
+        // Different supported tender types.
+        XCTAssertNotEqual(baseRequest, try! SCCAPIRequest(
+            callbackURL: callbackURL,
+            amount: amount,
+            userInfoString: userInfoString,
+            merchantID: merchantID,
+            notes: notes,
+            supportedTenderTypes: SCCAPIRequestTenderTypes.All,
+            allowSplitTender: allowSplitTender,
+            clearsDefaultFees: !clearsDefaultFees,
+            returnAutomaticallyAfterPayment: autoreturn))
+
+        // Different allow split tender.
+        XCTAssertNotEqual(baseRequest, try! SCCAPIRequest(
+            callbackURL: callbackURL,
+            amount: amount,
+            userInfoString: userInfoString,
+            merchantID: merchantID,
+            notes: notes,
+            supportedTenderTypes: SCCAPIRequestTenderTypes.All,
+            allowSplitTender: false,
+            clearsDefaultFees: !clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
 
         // Different clears default fees.
@@ -278,6 +319,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: !clearsDefaultFees,
             returnAutomaticallyAfterPayment: autoreturn))
 
@@ -289,6 +331,7 @@ class SCCAPIRequestTests: SCCTestCase {
             merchantID: merchantID,
             notes: notes,
             supportedTenderTypes: supportedTenderTypes,
+            allowSplitTender: allowSplitTender,
             clearsDefaultFees: clearsDefaultFees,
             returnAutomaticallyAfterPayment: !autoreturn))
     }
@@ -301,9 +344,19 @@ class SCCAPIRequestTests: SCCTestCase {
         let creditOnlyStrings = NSArrayOfTenderTypeStringsFromSCCAPIRequestTenderTypes(.Card) as! [ String ]
         XCTAssertEqual(creditOnlyStrings, [ SCCAPIRequestOptionsTenderTypeStringCard ])
 
+        let creditAndCash = SCCAPIRequestTenderTypes.Card.union(.Cash)
+        let creditAndCashStrings = NSArrayOfTenderTypeStringsFromSCCAPIRequestTenderTypes(creditAndCash) as! [ String ]
+        XCTAssertEqual(creditAndCashStrings, [
+            SCCAPIRequestOptionsTenderTypeStringCard,
+            SCCAPIRequestOptionsTenderTypeStringCash
+        ])
+
         let allStrings = NSArrayOfTenderTypeStringsFromSCCAPIRequestTenderTypes(.All) as! [ String ]
         XCTAssertEqual(allStrings, [
-            SCCAPIRequestOptionsTenderTypeStringCard
+            SCCAPIRequestOptionsTenderTypeStringCard,
+            SCCAPIRequestOptionsTenderTypeStringCash,
+            SCCAPIRequestOptionsTenderTypeStringOther,
+            SCCAPIRequestOptionsTenderTypeStringGiftCard
         ])
     }
 }

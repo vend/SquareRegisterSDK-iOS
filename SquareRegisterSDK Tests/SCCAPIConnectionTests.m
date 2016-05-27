@@ -51,6 +51,7 @@
                                                               merchantID:nil
                                                                    notes:nil
                                                     supportedTenderTypes:SCCAPIRequestTenderTypeCard
+                                                        allowSplitTender:NO
                                                        clearsDefaultFees:NO
                                          returnAutomaticallyAfterPayment:NO
                                                                    error:NULL];
@@ -79,6 +80,7 @@
                                                               merchantID:nil
                                                                    notes:nil
                                                     supportedTenderTypes:SCCAPIRequestTenderTypeCard
+                                                        allowSplitTender:NO
                                                        clearsDefaultFees:NO
                                          returnAutomaticallyAfterPayment:NO
                                                                    error:NULL];

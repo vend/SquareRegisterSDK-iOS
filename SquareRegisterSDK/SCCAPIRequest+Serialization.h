@@ -31,8 +31,12 @@ extern NSString *__nonnull const SCCAPIRequestNotesKey;
 extern NSString *__nonnull const SCCAPIRequestOptionsKey;
 extern NSString *__nonnull const SCCAPIRequestOptionsClearDefaultFeesKey;
 extern NSString *__nonnull const SCCAPIRequestOptionsSupportedTenderTypesKey;
+extern NSString *__nonnull const SCCAPIRequestOptionsAllowSplitTenderKey;
 extern NSString *__nonnull const SCCAPIRequestOptionsAutoReturnKey;
 extern NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringCard;
+extern NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringCash;
+extern NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringOther;
+extern NSString *__nonnull const SCCAPIRequestOptionsTenderTypeStringGiftCard;
 
 
 /**

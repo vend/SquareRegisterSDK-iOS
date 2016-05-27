@@ -44,6 +44,9 @@
     // Specify which forms of tender the merchant can accept
     SCCAPIRequestTenderTypes const supportedTenderTypes = SCCAPIRequestTenderTypeCard;
 
+    // Specify whether multiple tenders are allowed on the same transaction.
+    BOOL const allowSplitTender = NO;
+
     // Specify whether default fees in Square Register are cleared from this transaction
     // (Default is NO, they are not cleared)
     BOOL const clearsDefaultFees = YES;
@@ -65,6 +68,7 @@
                                                               merchantID:merchantID
                                                                    notes:notes
                                                     supportedTenderTypes:supportedTenderTypes
+                                                        allowSplitTender:allowSplitTender
                                                        clearsDefaultFees:clearsDefaultFees
                                          returnAutomaticallyAfterPayment:NO
                                                                    error:&error];
