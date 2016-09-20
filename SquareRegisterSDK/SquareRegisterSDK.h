@@ -22,11 +22,11 @@
 #import <Foundation/Foundation.h>
 
 // Categories
-#import <SquareRegisterSDK/NSError+SCCAdditions.h>
-#import <SquareRegisterSDK/NSError+SCCAPIAdditions.h>
+#import "NSError+SCCAdditions.h"
+#import "NSError+SCCAPIAdditions.h"
 
 // Classes
-#import <SquareRegisterSDK/SCCAPIConnection.h>
-#import <SquareRegisterSDK/SCCAPIRequest.h>
-#import <SquareRegisterSDK/SCCAPIResponse.h>
-#import <SquareRegisterSDK/SCCMoney.h>
+#import "SCCAPIConnection.h"
+#import "SCCAPIRequest.h"
+#import "SCCAPIResponse.h"
+#import "SCCMoney.h"
