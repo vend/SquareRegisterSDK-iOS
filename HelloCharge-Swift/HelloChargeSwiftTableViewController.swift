@@ -6,7 +6,7 @@
 //  Copyright © 2016 Square, Inc. All rights reserved.
 //
 
-import SquareRegisterSDK
+import SquarePointOfSaleSDK
 import UIKit
 
 
@@ -20,10 +20,14 @@ let yourCallbackURL = URL(string: "hellocharge://callback")!
 
 enum Section: Int {
     case amount = 0, supportedTenderTypes, optionalFields, settings
+
+    init?(at indexPath: IndexPath) {
+        self.init(rawValue: indexPath.section)
+    }
 }
 
 
-let allTenderTypes: [SCCAPIRequestTenderTypes] = [.card, .cash, .other, .squareGiftCard]
+let allTenderTypes: [SCCAPIRequestTenderTypes] = [.card, .cash, .other, .squareGiftCard, .cardOnFile]
 
 
 extension String {
@@ -45,6 +49,7 @@ class HelloChargeSwiftTableViewController: UITableViewController {
     @IBOutlet weak var notesField: UITextField!
     @IBOutlet weak var userInfoStringField: UITextField!
     @IBOutlet weak var merchantIDField: UITextField!
+    @IBOutlet weak var customerIDField: UITextField!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -56,40 +61,29 @@ class HelloChargeSwiftTableViewController: UITableViewController {
     // MARK: - UITableViewDataSource
 
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let section = Section(rawValue: indexPath.section) {
-            switch section {
-            case .supportedTenderTypes:
-                let tenderTypeForRow = allTenderTypes[indexPath.row]
-                let checked = supportedTenderTypes.contains(tenderTypeForRow)
-                cell.accessoryType = (checked ? .checkmark : .none)
-            case .settings:
-                if indexPath.row == 0 {
-                    cell.accessoryType = (clearsDefaultFees ? .checkmark : .none)
-                } else if indexPath.row == 1 {
-                    cell.accessoryType = (returnAutomaticallyAfterPayment ? .checkmark : .none)
-                }
-            case .amount, .optionalFields:
-                return
-            }
+        if shouldShowCheckmark(for: indexPath) {
+            cell.accessoryType = .checkmark
+        } else {
+            cell.accessoryType = .none
         }
     }
     
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        if let section = Section(rawValue: indexPath.section) {
-            switch section {
-            case .supportedTenderTypes, .settings:
-                return indexPath
-            case .amount, .optionalFields:
-                return nil
-            }
+        guard let section = Section(at: indexPath) else {
+            return nil
         }
-        
-        return nil
+
+        switch section {
+        case .supportedTenderTypes, .settings:
+            return indexPath
+        case .amount, .optionalFields:
+            return nil
+        }
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if let section = Section(rawValue: indexPath.section) {
+        if let section = Section(at: indexPath) {
             switch section {
             case .supportedTenderTypes:
                 let tenderTypeForRow = allTenderTypes[indexPath.row]
@@ -106,7 +100,7 @@ class HelloChargeSwiftTableViewController: UITableViewController {
         }
         
         let cell = tableView.cellForRow(at: indexPath)!
-        self.tableView(tableView, willDisplay:cell, forRowAt: indexPath)
+        self.tableView(tableView, willDisplay: cell, forRowAt: indexPath)
     }
     
     // MARK: - Actions
@@ -115,6 +109,7 @@ class HelloChargeSwiftTableViewController: UITableViewController {
         guard let oauthURL = URL(string: "https://squareup.com/oauth2/authorize?client_id=\(yourClientID)&scope=PAYMENTS_WRITE&response_type=token") else {
             return
         }
+
         UIApplication.shared.openURL(oauthURL)
     }
     
@@ -138,6 +133,7 @@ class HelloChargeSwiftTableViewController: UITableViewController {
         
         let userInfoString = userInfoStringField.text?.nilIfEmpty
         let merchantID = merchantIDField.text?.nilIfEmpty
+        let customerID = customerIDField.text?.nilIfEmpty
         let notes = notesField.text?.nilIfEmpty
 
         let request: SCCAPIRequest
@@ -147,6 +143,7 @@ class HelloChargeSwiftTableViewController: UITableViewController {
                                         userInfoString: userInfoString,
                                         merchantID: merchantID,
                                         notes: notes,
+                                        customerID: customerID,
                                         supportedTenderTypes: supportedTenderTypes,
                                         clearsDefaultFees: clearsDefaultFees,
                                         returnAutomaticallyAfterPayment: returnAutomaticallyAfterPayment)
@@ -164,6 +161,21 @@ class HelloChargeSwiftTableViewController: UITableViewController {
     }
     
     // MARK: - Private Methods
+    private func shouldShowCheckmark(for indexPath: IndexPath) -> Bool {
+        guard let section = Section(at: indexPath) else {
+            return false
+        }
+
+        switch section {
+        case .supportedTenderTypes:
+            let tenderTypeForRow = allTenderTypes[indexPath.row]
+            return supportedTenderTypes.contains(tenderTypeForRow)
+
+        case .settings where indexPath.row == 0: return clearsDefaultFees
+        case .settings where indexPath.row == 1: return returnAutomaticallyAfterPayment
+        default: return false
+        }
+    }
     
     private func showErrorMessage(title: String, error: NSError) {
         showErrorMessage(title: title, message: error.localizedDescription)
